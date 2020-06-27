@@ -1,0 +1,18 @@
+{% extends 'my_site/base.html' %}
+{% block content %}
+    {% block title_site %}
+        <h1>Glowna</h1>
+    {% endblock title_site %}
+    {% for meme in memes %}
+    <div class="article-metadata">
+        <a href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a>
+        <br>
+        <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
+        <br>
+        <p class="mb-0" style="color: green;">{{ meme.thumb_up.count }} / <span style="color:red;">{{ meme.thumb_down.count}}</span></p>
+    </div>
+
+            
+    {% endfor %}
+
+{% endblock content %}

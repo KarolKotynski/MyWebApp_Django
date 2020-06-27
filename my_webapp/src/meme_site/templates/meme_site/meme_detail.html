@@ -1,0 +1,73 @@
+{% extends 'my_site/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div>
+    <p2> {{ my_object.title }}</p2>
+</div>
+<img src=" {{ my_object.image.url }}" class="rounded">
+
+<div>
+    <p2> {{ my_object.user }}</p2>
+    <p2> {{ my_object.id}}</p2>
+    <p2> {{ my_object.slug }} </p2>
+    <p class="mb-0" style="color: green;">{{ my_object.thumb_up.count }} / <span style="color:red;">{{ my_object.thumb_down.count}}</span></p>
+</div>
+
+
+{% if user.is_authenticated %}
+<div class="content-section">
+    {% if thumbed_up == False and thumbed_down == False %}
+            <a href="{% url 'like_up' my_object.id %}"><img class="rounded circle_vote" src="/media/plus.png"></a>
+            <a href="{% url 'like_down' my_object.id %}"><img class="rounded circle_vote" src="/media/minus.png"></a>
+        {% elif thumbed_up == True and thumbed_down == False %}
+            <img class="rounded circle_vote" src="/media/plus_clicked.png"></a>
+            <img class="rounded circle_vote" src="/media/minus.png"></a>
+        {% elif thumbed_up == False and thumbed_down == True %}
+            <img class="rounded circle_vote" src="/media/plus.png"></a>
+            <img class="rounded circle_vote" src="/media/minus_clicked.png"></a>
+    {% endif %}
+    {% if user.authenticated == my_object.user %}
+        <h> asdf </h>
+    {% endif %}
+    <a href="{% url 'memeDeleteView' my_object.id %}">Delete post</a>
+
+    <form method="POST">
+        {% csrf_token %}
+        <!-- hidden tag - security what Django required-->
+        <legend class="border-top">Leave comment!</legend>
+            {{ comment_form.content }}
+        <div clas="form-group">
+            <button class="btn btn-outline-info" type="submit">Submit</button>
+        </div>
+    </form>
+    <br><br>
+</div>
+{% endif %}
+
+
+{% if my_comments.count < 2 %}
+    {{ my_comments.count }} comment:
+{% else %}
+    {{ my_comments.count }} comments:
+{% endif %}
+
+
+{% for comment in my_comments %}
+<div class="blockquote">
+    <div class="font-size: small">
+        <p class="mb-0"> {{comment.content }} </p>
+    </div>
+    <footer class="blockquote-footer">By <cite title="Source Title">{{comment.user|capfirst}}</cite></footer>
+</div>
+{% endfor %}
+
+
+
+
+
+
+
+
+{% endblock content%}

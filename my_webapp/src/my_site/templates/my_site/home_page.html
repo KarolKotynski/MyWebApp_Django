@@ -1,0 +1,6 @@
+{% extends 'my_site/base.html' %}
+{% block content %}
+    {% for titles in posts%}
+        <h1>{{titles.title}}</h1>
+    {% endfor %}
+{% endblock content %}

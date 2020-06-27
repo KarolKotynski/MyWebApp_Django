@@ -1,0 +1,27 @@
+{% extends 'my_site/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    <div class="media">
+        <img class="rounded-circle circle_images" src="{{ user.mysiteprofile.image.url}}">
+        <div class="media-body">
+        <h2 class="account-heading">{{ user.username }}</h2>
+        <p class="text-secondary"> {{ user.email }} </p>
+        </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- hidden tag - security what Django required-->
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Profile info</legend>
+            {{ profileform|crispy }}
+        </fieldset>
+        <div clas="form-group">
+            <button class="btn btn-outline-info" type="submit">Update</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock content %}
+

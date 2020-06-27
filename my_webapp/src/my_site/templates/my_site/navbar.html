@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-steel">
+
+    <div class="collapse navbar-collapse" id="navbarToggle">
+        <a class="btn btn-warning mr-2" href="{% url 'home_page' %}">Home</a>
+        <a class="btn btn-warning mr-2" href="{% url 'about_page' %}">About me</a>
+    </div>
+
+    <div class="dropdown mr-1">
+        <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Meme site
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'memeListView' %}">Meme</a>
+            <a class="dropdown-item" href="{% url 'memeLobbyListView' %}">Lobby</a>
+            {% if user.is_authenticated %}
+            <a class="dropdown-item" href="{% url 'userMemes' user.username %}">My Memes</a>
+            <a class="dropdown-item" href="{% url 'memeAdd' %}">Add Meme!</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="">
+        {% if user.is_authenticated %}
+        <a class="btn btn-warning" href="{% url 'mySiteProfile_page' %}">{{ user.username }}</a>
+            <a class="btn btn-warning" href="{% url 'mySiteLogout_page' %}">Logout</a>
+        {% else %}
+            <a class="btn btn-warning" href="{% url 'mySiteLogin_page' %}">Login</a>
+            <a class="btn btn-warning" href="{% url 'mySiteRegister_page' %}">Register</a>
+        {% endif %}
+
+        {% block login %}
+
+        {% endblock login %}
+    </div>
+
+</nav>
