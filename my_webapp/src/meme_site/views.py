@@ -24,6 +24,7 @@ class MemeListView(ListView):
             if obj.thumb_up.count() >= 3:
                 _new_objects.append(obj)
                 
+                
         return _new_objects
 
 
