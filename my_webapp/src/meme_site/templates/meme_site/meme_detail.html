@@ -56,8 +56,9 @@
 {% endif %}
 
 <div class="comment_section">
-    
-    {% if my_comments.count < 2 %}
+    {% if my_comments.count == 0 %}
+    <h6>{{ my_comments.count }} comments</h6>
+    {% elif my_comments.count < 2 %}
     <h6>{{ my_comments.count }} comment:</h6>
     {% else %}
     <h6>{{ my_comments.count }} comments:</h6>
