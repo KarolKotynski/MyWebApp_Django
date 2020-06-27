@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'meme_site.apps.MemeSiteConfig',
     'crispy_forms',
     'django_extensions',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [

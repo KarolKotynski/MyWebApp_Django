@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .models import MemePost, Comment_section
 from .forms import CommentForm
 from django.db.models import Q
+import datetime
 # Create your views here.
 
 class MemeListView(ListView):
@@ -74,6 +75,10 @@ def memeDetailView(request, id):
         return redirect(post.get_absolute_url())
     else:
         comment_form= CommentForm()
+
+    current_date = datetime.datetime.now()
+
+    date_delay = comments
     
     ## To be refactored ..
     ## maybe just make here the function of thumbs_up and down
@@ -92,6 +97,7 @@ def memeDetailView(request, id):
         'comment_form': comment_form,
         'thumbed_up': thumbed_up,
         'thumbed_down': thumbed_down,
+        'current_date': current_date,
     }
 
     return render(request, template_name, context)
