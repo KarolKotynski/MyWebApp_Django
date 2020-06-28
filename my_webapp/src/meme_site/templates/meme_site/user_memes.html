@@ -1,16 +1,5 @@
-{% extends 'my_site/base.html' %}
-{% block content %}
-<h1>Memes by: {{ view.kwargs.username }}</h1>
-    {% for meme in memes %}
-    <div class="article-metadata">
-        <a href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a>
-        <br>
-        <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
-        <br>
-        <p class="mb-0" style="color: green;">{{ meme.thumb_up.count }} / <span style="color:red;">{{ meme.thumb_down.count}}</span></p>
-    </div>
-
-            
-    {% endfor %}
-
-{% endblock content %}
+{% extends 'meme_site/meme_site.html' %}
+{% block title_site %}
+<h1 class="header_page">Memes by: {{ view.kwargs.username }}</h1>
+<h4 style="color: whitesmoke;">Found: {{ memes.count }} memes.</h4>
+{% endblock title_site %}

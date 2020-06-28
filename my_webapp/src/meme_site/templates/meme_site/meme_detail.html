@@ -1,5 +1,4 @@
 {% extends 'my_site/base.html' %}
-{% load crispy_forms_tags %}
 {% load humanize %}
 
 {% block content %}
@@ -11,8 +10,9 @@
     </div>
     <div class="box_title">
         <h2> {{ my_object.title }}</h2>
+        <img src=" {{ my_object.image.url }}" class="rounded">
     </div>
-    <img src=" {{ my_object.image.url }}" class="rounded">
+    
 
     <div class="likes_section">
         <h3 style="color: green;">{{ my_object.thumb_up.count }}
@@ -72,9 +72,10 @@
                 <p class="mb-0"> {{ comment.timestamp|naturaltime }} </p>
             </small>
         </div>
-        <footer class="blockquote-footer">By <cite
-                title="Source Title">{{comment.user|capfirst}}</cite></footer>
+        <footer class="blockquote-footer">By<cite
+                title="Source Title"><a href="{% url 'mySiteProfile_page' %}" style="color: #ffffff;">{{comment.user|capfirst}}</a></cite></footer>
     </div>
+    
     {% endfor %}
 </div>
 

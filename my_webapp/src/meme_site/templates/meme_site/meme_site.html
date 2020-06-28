@@ -1,18 +1,29 @@
 {% extends 'my_site/base.html' %}
 {% block content %}
-    {% block title_site %}
-        <h1>Glowna</h1>
-    {% endblock title_site %}
-    {% for meme in memes %}
-    <div class="article-metadata">
-        <a href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a>
-        <br>
-        <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
-        <br>
-        <p class="mb-0" style="color: green;">{{ meme.thumb_up.count }} / <span style="color:red;">{{ meme.thumb_down.count}}</span></p>
+{% block title_site %}
+<h1 class="header_page">Main site</h1>
+{% endblock title_site %}
+{% for meme in memes %}
+<div class="article-metadata-post">
+    <div class="authorbox">
+        <h1><img src="{{ meme.user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
+            {{ meme.user.username }}</h1>
     </div>
+    <div class="box_title">
+        <h2><a style="color:whitesmoke" href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a></h2>
+        <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
+    </div>
+    
+    <div class="likes_section">
+        <h3 style="color: green;">{{ meme.thumb_up.count }}
+            <span style="color:rgb(0, 0, 0);">/</span>
+            <span style="color:red;">{{ meme.thumb_down.count }}</span>
+        </h3>
+    </div>
+    
+</div>
 
-            
-    {% endfor %}
+
+{% endfor %}
 
 {% endblock content %}
