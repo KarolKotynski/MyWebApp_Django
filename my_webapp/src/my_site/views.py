@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
-from .models import About_me
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import About_me, MySiteProfile
 from .forms import UserRegisterForm, ProfileUpdateImgForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from meme_site.models import MemePost
 
 
 # Create your views here.
@@ -56,21 +58,42 @@ def register(request):
     # render template and take context from our form
     return render(request, template, {'form': form})
 
-@login_required
-def profile(request):
-    if request.method == "POST":
-        user_profileform = ProfileUpdateImgForm(request.POST, request.FILES, instance=request.user.mysiteprofile)
-        if user_profileform.is_valid():
-            user_profileform.save()
-            messages.success(request, f"{request.user}, your image has been changed")
-            return redirect('mySiteProfile_page')
-    else:
-        user_profileform = ProfileUpdateImgForm(instance=request.user)
+
+def profile(request, user):
+    user_profile = get_object_or_404(MySiteProfile, user=User.objects.filter(username=user).first())
+    user_requested = request.user
+    print(user_profile.user.username)
+    user_memes = MemePost.objects.filter(user=user_profile.user.id).order_by('-date_added')
+    print(user_memes)
     
-    context = {
-        'profileform': user_profileform
-    }
+
+    
+
+    if user_profile.user.username == user_requested.username:
+        if request.method == "POST":
+            user_profileform = ProfileUpdateImgForm(request.POST, request.FILES, instance=request.user.mysiteprofile)
+            if user_profileform.is_valid():
+                user_profileform.save()
+                messages.success(request, f"{request.user}, your image has been changed")
+                return redirect('mySiteProfile_page')
+        else:
+            user_profileform = ProfileUpdateImgForm(instance=request.user)
+        context = {
+            'profileform': user_profileform,
+            'memes': user_memes,
+        }
+    else:
+        context = {
+        'user': user_profile.user,
+        'user_requested': user_requested,
+        'image': user_profile.image.url,
+        'memes': user_memes,
+        }
+
     template = 'my_site/profile.html'
+
+    
+  
 
 
     return render(request, template, context)

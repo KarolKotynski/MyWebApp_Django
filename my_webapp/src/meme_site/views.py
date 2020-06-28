@@ -14,8 +14,6 @@ class MemeListView(ListView):
     model = MemePost
     template_name = 'meme_site/meme_site.html'
     context_object_name = 'memes'
-    ordering = ['-date_added']
-
     
 
     def get_queryset(self):
@@ -32,7 +30,6 @@ class MemeLobby(ListView):
     model = MemePost
     template_name = 'meme_site/meme_lobby.html'
     context_object_name = 'memes'
-
 
     def get_queryset(self):
         _objects = MemePost.objects.filter().all()

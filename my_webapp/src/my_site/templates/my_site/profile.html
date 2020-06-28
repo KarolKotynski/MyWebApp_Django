@@ -2,26 +2,49 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="content-section">
-    <div class="media">
-        <img class="rounded-circle circle_images" src="{{ user.mysiteprofile.image.url}}">
-        <div class="media-body">
-        <h2 class="account-heading">{{ user.username }}</h2>
-        <p class="text-secondary"> {{ user.email }} </p>
-        </div>
+
+    <div class="authorbox">
+        <h1><img src="{{ user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
+            <a href="{% url 'mySiteProfile_page' user.username %}" style="color: #ffffff;">{{ user.username }}</a></h1>
+        {% if user.user.username == user_requested.username %}
+        <p class="text-secondary" style="color: #ffffff; text-align: left;"> {{ user.email }} </p>
     </div>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" style="border-bottom: 30px solid #444444;">
         {% csrf_token %}
         <!-- hidden tag - security what Django required-->
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Profile info</legend>
+            <legend class="border-bottom mb-4">Change profile image</legend>
             {{ profileform|crispy }}
         </fieldset>
         <div clas="form-group">
-            <button class="btn btn-outline-info" type="submit">Update</button>
+            <button class="btn btn-outline-info mb-2" type="submit">Update</button>
         </div>
     </form>
+    {% endif %}
 </div>
 
 
-{% endblock content %}
+<div class="box_title" style="text-align: center; max-width: 750px;">
+    <h2>{{ user.username }} Memes</h2>
+</div>
+{% for meme in memes %}
+<div class="article-metadata-post">
+    <div class="box_title">
+        <h2><a style="color:whitesmoke" href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a></h2>
+        <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
+    </div>
+    <div class="likes_section">
+        <h3 style="color: green;">{{ meme.thumb_up.count }}
+            <span style="color:rgb(0, 0, 0);">/</span>
+            <span style="color:red;">{{ meme.thumb_down.count }}</span>
+        </h3>
+        <h5>{{ meme.date_added|date:"F j, Y, G:i" }}</h5>
+    </div>
+    </br>
+</div>
 
+
+{% endfor %}
+
+
+{% endblock content %}

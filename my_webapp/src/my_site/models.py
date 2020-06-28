@@ -14,7 +14,7 @@ class MySiteProfile(models.Model):
     image = models.ImageField(default="incognito.png", upload_to="Profile_image")
 
     def __str__(self):
-        return f"{self.user.username} Profie."
+        return f"{self.user.username} Profile."
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

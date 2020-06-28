@@ -7,7 +7,7 @@
 <div class="article-metadata-post">
     <div class="authorbox">
         <h1><img src="{{ meme.user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            {{ meme.user.username }}</h1>
+            <a href="{% url 'mySiteProfile_page' meme.user.username %}" style="color: #ffffff;">{{ meme.user.username }}</a></h1>
     </div>
     <div class="box_title">
         <h2><a style="color:whitesmoke" href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a></h2>
@@ -19,6 +19,7 @@
             <span style="color:rgb(0, 0, 0);">/</span>
             <span style="color:red;">{{ meme.thumb_down.count }}</span>
         </h3>
+        <h5>{{ meme.date_added|date:"F j, Y, G:i" }}</h5>
     </div>
     
 </div>

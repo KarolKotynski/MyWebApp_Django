@@ -13,6 +13,6 @@ urlpatterns = [
     path('about/', about_me, name="about_page"),
     path('register/', register, name="mySiteRegister_page"),
     path('login/', authView.LoginView.as_view(template_name='my_site/login.html'), name="mySiteLogin_page"),
-    path('profile/', profile, name="mySiteProfile_page"),
+    path('profile/<str:user>', profile, name="mySiteProfile_page"),
     path('logout/', authView.LogoutView.as_view(template_name='my_site/logout.html'), name="mySiteLogout_page")
 ]

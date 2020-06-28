@@ -16,6 +16,9 @@ class MemePost(models.Model):
     thumb_up = models.ManyToManyField(User, related_name="liked_up", blank=True)
     thumb_down = models.ManyToManyField(User, related_name="liked_down", blank=True)
 
+    class Meta:
+        ordering = ['-date_added']
+
     def __str__(self):
         return f"{self.user.username}, {self.title}"
     
