@@ -6,14 +6,14 @@
 <div class="article-metadata">
     <div class="authorbox">
         <h1><img src="{{ my_object.user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            {{ my_object.user.username }}</h1>
+            <a href="{% url 'mySiteProfile_page' my_object.user.username %}">{{ my_object.user.username }}</a></h1>
     </div>
     <div class="box_title">
         <h2> {{ my_object.title }}</h2>
         <img src=" {{ my_object.image.url }}" class="rounded">
     </div>
     
-
+    {% if user.is_authenticated %}
     <div class="likes_section">
         <h3 style="color: green;">{{ my_object.thumb_up.count }}
             <span style="color:rgb(0, 0, 0);">/</span>
@@ -38,6 +38,7 @@
         </small>
         {% endif %}
     </div>
+    {% endif %}
 </div>
 
 {% if user.is_authenticated %}
@@ -72,8 +73,8 @@
                 <p class="mb-0"> {{ comment.timestamp|naturaltime }} </p>
             </small>
         </div>
-        <footer class="blockquote-footer">By<cite
-                title="Source Title"><a href="{% url 'mySiteProfile_page' %}" style="color: #ffffff;">{{comment.user|capfirst}}</a></cite></footer>
+        <footer class="blockquote-footer">By <cite
+                title="Source Title"><a href="{% url 'mySiteProfile_page' comment.user %}" style="color: #ffffff;">{{comment.user|capfirst}}</a></cite></footer>
     </div>
     
     {% endfor %}

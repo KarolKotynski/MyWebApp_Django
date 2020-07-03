@@ -8,12 +8,14 @@ from .models import MemePost, Comment_section
 from .forms import CommentForm
 from django.db.models import Q
 import datetime
+from django.core.paginator import Paginator
 # Create your views here.
 
 class MemeListView(ListView):
     model = MemePost
     template_name = 'meme_site/meme_site.html'
     context_object_name = 'memes'
+    paginate_by = 5
     
 
     def get_queryset(self):
@@ -30,6 +32,7 @@ class MemeLobby(ListView):
     model = MemePost
     template_name = 'meme_site/meme_lobby.html'
     context_object_name = 'memes'
+    paginate_by = 5
 
     def get_queryset(self):
         _objects = MemePost.objects.filter().all()
@@ -96,7 +99,9 @@ def memeDetailView(request, id):
         'thumbed_down': thumbed_down,
         'current_date': current_date,
     }
-
+    print("HELLO")
+    print(context)
+    print(user.id)
     return render(request, template_name, context)
 
 

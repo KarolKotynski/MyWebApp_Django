@@ -1,5 +1,9 @@
 {% extends 'meme_site/meme_site.html' %}
 {% block title_site %}
 <h1 class="header_page">Memes by: {{ view.kwargs.username }}</h1>
+{% if memes.count < 2 %}
+<h4 style="color: whitesmoke;">Found: {{ memes.count }} meme.</h4>
+{% else %}
 <h4 style="color: whitesmoke;">Found: {{ memes.count }} memes.</h4>
+{% endif %}
 {% endblock title_site %}

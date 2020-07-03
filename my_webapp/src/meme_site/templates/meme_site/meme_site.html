@@ -7,13 +7,14 @@
 <div class="article-metadata-post">
     <div class="authorbox">
         <h1><img src="{{ meme.user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            <a href="{% url 'mySiteProfile_page' meme.user.username %}" style="color: #ffffff;">{{ meme.user.username }}</a></h1>
+            <a href="{% url 'mySiteProfile_page' meme.user.username %}"
+                style="color: #ffffff;">{{ meme.user.username }}</a></h1>
     </div>
     <div class="box_title">
         <h2><a style="color:whitesmoke" href="{% url 'memeDetailView' meme.id %}">{{ meme.title }}</a></h2>
         <a href="{% url 'memeDetailView' meme.id %}"><img src=" {{ meme.image.url }}" class="rounded"></a>
     </div>
-    
+
     <div class="likes_section">
         <h3 style="color: green;">{{ meme.thumb_up.count }}
             <span style="color:rgb(0, 0, 0);">/</span>
@@ -21,10 +22,34 @@
         </h3>
         <h5>{{ meme.date_added|date:"F j, Y, G:i" }}</h5>
     </div>
-    
+    {% endfor %}
+
+
+
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_next %}
+        <a class="btn btn-next btn-yellow" href="?page={{ page_obj.next_page_number }}">Next page</a>
+        <a class="btn btn-last btn-yellow" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% else %}
+        <a class="btn btn-next btn-yellow" href="?page={{ page_obj.previous_page_number }}">Previous page</a>
+        <a class="btn btn-last btn-yellow" href="?page=1">First</a>
+        {% endif %}
+    </div>
+
+    <div class="pages">
+        {% for number in page_obj.paginator.page_range %}
+        {% if page_obj.number == number %}
+
+        <a class="pages" style="color: white;" href="?page={{ page_obj.number }}">
+            {{ page_obj.number }}</a>
+        {% elif number > page_obj.number|add:'-5' and number < page_obj.number|add:'10' %}
+        <a class="pages" href="?page={{ number }}"> {{ number }}</a>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
 </div>
-
-
-{% endfor %}
-
 {% endblock content %}
