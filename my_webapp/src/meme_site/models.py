@@ -34,14 +34,15 @@ class MemePost(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-"""
-creating class Comment section:
-our post will be foreign key taken from MemePost
-user will be assigned to actual User
-content could be created with max length 500 characters
-timestamt will be actual time
-"""
+
 class Comment_section(models.Model):
+    """
+    creating class Comment section:
+    our post will be foreign key taken from MemePost
+    user will be assigned to actual User
+    content could be created with max length 500 characters
+    timestamt will be actual time
+    """
     post = models.ForeignKey(MemePost, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField(max_length=500)

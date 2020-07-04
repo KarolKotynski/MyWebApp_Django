@@ -35,16 +35,17 @@ def about_me(request):
     
     return render(request, 'my_site/about_me.html', context)
 
-"""
-function to create an account
-We are using form from forms.py (UserRegisterForm)
-we have to input 4 variables: username, email, password and confirm password.
-if username is unique and passwords are correct then account will be created
-and we will be redirected to the login page.
-if not then we will be redirected again to register site with old inputs
 
-"""
 def register(request):
+    """
+    function to create an account
+    We are using form from forms.py (UserRegisterForm)
+    we have to input 4 variables: username, email, password and confirm password.
+    if username is unique and passwords are correct then account will be created
+    and we will be redirected to the login page.
+    if not then we will be redirected again to register site with old inputs
+
+    """
     # if we request to create an account
     if request.method == 'POST':
         # then we will use our form to create an account
@@ -68,14 +69,15 @@ def register(request):
     return render(request, template, {'form': form})
 
 
-"""
-Getting user profile and its Memes from MemeSite and paginate the site to 3 memes per page
-if logged user is equal to requested user then we will be able to change user image profile
-using form from form.py (ProfileUpdateImgForm)
-if not then we will be able only to see user memes.
-"""
+
 @login_required
 def profile(request, user):
+    """
+    Getting user profile and its Memes from MemeSite and paginate the site to 3 memes per page
+    if logged user is equal to requested user then we will be able to change user image profile
+    using form from form.py (ProfileUpdateImgForm)
+    if not then we will be able only to see user memes.
+    """
     # get user profile name
     user_profile = get_object_or_404(MySiteProfile, user=User.objects.filter(username=user).first())
     
