@@ -24,7 +24,7 @@
         {% if user_profile.user.username == user_requested.username %}
         <a class="btn btn-warning" href="{% url 'mySiteProfile_page' user.username %}">{{ user.username }}</a>
         {% else %}
-        <a class="btn btn-warning" href="{{ user_requested.username }}">{{ user_requested.username }}</a>
+        <a class="btn btn-warning" href="{% url 'mySiteProfile_page' user_requested.username %}">{{ user_requested.username }}</a>
         {% endif %}
         
             <a class="btn btn-warning" href="{% url 'mySiteLogout_page' %}">Logout</a>

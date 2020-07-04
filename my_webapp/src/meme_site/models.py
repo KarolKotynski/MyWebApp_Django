@@ -8,7 +8,6 @@ from django.urls import reverse
 
 
 class MemePost(models.Model):
-    #slug = models.SlugField(unique=False, default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='meme_images/', blank=False, null=False)
     title = models.CharField(max_length=100)
@@ -35,11 +34,13 @@ class MemePost(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
-# creating class Comment section:
-# our post will be foreign key taken from MemePost
-# user will be assigned to actual User
-# content could be created with max length 500 characters
-# timestamt will be actual time
+"""
+creating class Comment section:
+our post will be foreign key taken from MemePost
+user will be assigned to actual User
+content could be created with max length 500 characters
+timestamt will be actual time
+"""
 class Comment_section(models.Model):
     post = models.ForeignKey(MemePost, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

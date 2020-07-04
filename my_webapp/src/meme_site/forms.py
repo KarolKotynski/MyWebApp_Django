@@ -1,9 +1,10 @@
 from django import forms
 from .models import Comment_section
 
-# creating Form named CommentForm
-# creating class Meta where our model will be Comment_section from models.py
-# and we will edit content field
+"""
+creating class Meta where our model will be Comment_section from models.py
+and changed content form
+"""
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment_section

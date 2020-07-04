@@ -5,11 +5,11 @@
 
     <div class="authorbox">
         <h1><img src="{{ user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            <a href="{% url 'mySiteProfile_page' user.username %}" style="color: #ffffff;">{{ user.username }}</a></h1>
+            <a href="{% url 'userMemes' user.username %}" style="color: #ffffff;">{{ user.username }}</a></h1>
         {% if user.user.username == user_requested.username %}
         <p class="text-secondary" style="color: #ffffff; text-align: left;"> {{ user.email }} </p>
     </div>
-    <form method="POST" enctype="multipart/form-data" style="border-bottom: 30px solid #444444;">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <!-- hidden tag - security what Django required-->
         <fieldset class="form-group">
@@ -42,9 +42,29 @@
     </div>
     </br>
 </div>
-
-
 {% endfor %}
+{% if is_paginated %}
+    <div class="pagination">
+        {% if memes.has_next %}
+        <a class="btn btn-next btn-yellow" href="?page={{ memes.next_page_number }}">Next page</a>
+        <a class="btn btn-last btn-yellow" href="?page={{ memes.paginator.num_pages }}">Last</a>
+        {% else %}
+        <a class="btn btn-next btn-yellow" href="?page={{ memes.previous_page_number }}">Previous page</a>
+        <a class="btn btn-last btn-yellow" href="?page=1">First</a>
+        {% endif %}
+    </div>
 
+    <div class="pages">
+        {% for number in memes.paginator.page_range %}
+        {% if memes.number == number %}
+        <a class="pages" style="color: white;" href="?page={{ memes.number }}">
+            {{ memes.number }}</a>
+        {% elif number > memes.number|add:'-5' and number < memes.number|add:'10' %}
+        <a class="pages" href="?page={{ number }}"> {{ number }}</a>
+        {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+ 
 
 {% endblock content %}

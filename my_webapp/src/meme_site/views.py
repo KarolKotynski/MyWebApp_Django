@@ -8,9 +8,14 @@ from .models import MemePost, Comment_section
 from .forms import CommentForm
 from django.db.models import Q
 import datetime
-from django.core.paginator import Paginator
+#from django.core.paginator import Paginator
 # Create your views here.
 
+"""
+generate List view of memes which have at least 3 likes
+Memes are paginated by 5
+Memes are sorted from newest to the oldest
+"""
 class MemeListView(ListView):
     model = MemePost
     template_name = 'meme_site/meme_site.html'
@@ -28,6 +33,12 @@ class MemeListView(ListView):
         return _new_objects
 
 
+"""
+Lobby memes - at the beginning there get all of the memes where likes are below 3
+Lobby memes are paginated by 5
+Memes are sorted from newest to the oldest
+if meme get 3 likes then this meme will be rendered on the Main site
+"""
 class MemeLobby(ListView):
     model = MemePost
     template_name = 'meme_site/meme_lobby.html'
@@ -44,17 +55,26 @@ class MemeLobby(ListView):
         return _new_objects
 
 
-
+"""
+Collect all of user memes and paginate page by 5
+user memes are sorted from the newest to the oldest
+"""
 class UserMemeListView(ListView):
     model = MemePost
     template_name ='meme_site/user_memes.html'
     context_object_name = 'memes'
+    paginate_by = 5
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         return MemePost.objects.filter(user=user).order_by('-date_added')
 
 
+"""
+Showing one particular meme where is able to like or unlike this meme
+Logged users can add comments at the below of the meme
+Comment form is created using forms.py (CommentForm)
+"""
 def memeDetailView(request, id):
     post = get_object_or_404(MemePost, id=id)
     comments = Comment_section.objects.filter(post=post).order_by('-id')
@@ -99,12 +119,12 @@ def memeDetailView(request, id):
         'thumbed_down': thumbed_down,
         'current_date': current_date,
     }
-    print("HELLO")
-    print(context)
-    print(user.id)
     return render(request, template_name, context)
 
-
+"""
+Class to create meme - we can only add title of meme and its image.
+if form is valid then meme will be created.
+"""
 class MemeAddView(LoginRequiredMixin, CreateView):
     model = MemePost
     fields = ['title', 'image']
@@ -114,7 +134,9 @@ class MemeAddView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-
+"""
+function to delete meme if requested user is author of this meme.
+"""
 @login_required
 def deleteMeme(request, id):
     my_meme = get_object_or_404(MemePost, id=id)
@@ -140,7 +162,11 @@ def deleteMeme(request, id):
     return render(request, template, context)
 
 
-# working on class
+"""
+Class where we can add our like on the particular meme.
+if we liked this meme then we unable to dislike meme.
+Like works only one time at the requested user.
+"""
 class Meme_like_up(RedirectView):
     # function that will add us like up where we will get 3 argumnets
     def get_redirect_url(self, *args, **kwargs):
@@ -173,6 +199,12 @@ class Meme_like_up(RedirectView):
         # return absolute url
         return url_
 
+
+"""
+Class where we can add our unlike on the particular meme.
+if we unliked this meme then we unable to disunlike meme.
+Unlike works only one time at the requested user.
+"""
 class Like_down(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         # taking specific object
@@ -190,19 +222,6 @@ class Like_down(RedirectView):
             object_unlike.thumb_down.add(user)
             thumbed_down = True 
 
-        ### Anoher method if already thumbed down or not
-        # # if user is authenticated then:
-        # if user.is_authenticated:
-        #     # if user already unliked this meme then
-        #     if user in object_unlike.thumb_down.all():
-        #         # remove his unlike
-        #         object_unlike.thumb_down.remove(user)
-        #         thumbed_down = False 
-        #     else:
-        #         # if he didn't unlike then unlike it
-        #         object_unlike.thumb_down.add(user)
-        #         thumbed_down = True
-        # return to specific meme
         return url_
 
 
