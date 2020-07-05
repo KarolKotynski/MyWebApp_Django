@@ -7,11 +7,11 @@ from .models import MySiteProfile
 
 ## Create profile
 @receiver(post_save, sender=User)
-def mysite_createProfile(sender, instance, created, **kwargs):
+def mysite_create_profile(sender, instance, created, **kwargs):
     if created:
         MySiteProfile.objects.create(user=instance)
 
 ## Save profile
 @receiver(post_save, sender=User)
-def mysite_saveProfile(sender, instance, **kwargs):
+def mysite_save_profile(sender, instance, **kwargs):
     instance.mysiteprofile.save()

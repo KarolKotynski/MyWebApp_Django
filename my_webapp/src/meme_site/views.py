@@ -1,14 +1,13 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.views.generic import ListView, RedirectView, CreateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, RedirectView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import MemePost, Comment_section
+
+from .models import MemePost, CommentSection
 from .forms import CommentForm
-from django.db.models import Q
-import datetime
-#from django.core.paginator import Paginator
 # Create your views here.
 
 
@@ -22,7 +21,6 @@ class MemeListView(ListView):
     template_name = 'meme_site/meme_site.html'
     context_object_name = 'memes'
     paginate_by = 5
-    
 
     def get_queryset(self):
         _objects = MemePost.objects.filter().all()
@@ -30,9 +28,8 @@ class MemeListView(ListView):
         for obj in _objects:
             if obj.thumb_up.count() >= 3:
                 _new_objects.append(obj)
-                
-        return _new_objects
 
+        return _new_objects
 
 
 class MemeLobby(ListView):
@@ -57,14 +54,13 @@ class MemeLobby(ListView):
         return _new_objects
 
 
-
 class UserMemeListView(ListView):
     """
     Collect all of user memes and paginate page by 5
     user memes are sorted from the newest to the oldest
     """
     model = MemePost
-    template_name ='meme_site/user_memes.html'
+    template_name = 'meme_site/user_memes.html'
     context_object_name = 'memes'
     paginate_by = 5
 
@@ -73,15 +69,14 @@ class UserMemeListView(ListView):
         return MemePost.objects.filter(user=user).order_by('-date_added')
 
 
-
-def memeDetailView(request, id):
+def meme_detail_view(request, id):
     """
     Showing one particular meme where is able to like or unlike this meme
     Logged users can add comments at the below of the meme
     Comment form is created using forms.py (CommentForm)
     """
     post = get_object_or_404(MemePost, id=id)
-    comments = Comment_section.objects.filter(post=post).order_by('-id')
+    comments = CommentSection.objects.filter(post=post).order_by('-id')
     template_name = 'meme_site/meme_detail.html'
 
     # creating field where we can write comment
@@ -93,27 +88,28 @@ def memeDetailView(request, id):
         content = request.POST.get('content')
         # then create comment were post will be actual post, user will be requested user
         # and content taken from comment_form
-        comment = Comment_section.objects.create(post=post, user=request.user, content=content)
+        comment = CommentSection.objects.create(
+            post=post, user=request.user, content=content)
         # then save it and return actual site
         comment.save()
         return redirect(post.get_absolute_url())
     else:
-        comment_form= CommentForm()
+        comment_form = CommentForm()
 
     current_date = datetime.datetime.now()
 
     date_delay = comments
-    
-    ## To be refactored ..
-    ## maybe just make here the function of thumbs_up and down
-    thumbed_up = False 
+
+    # To be refactored ..
+    # maybe just make here the function of thumbs_up and down
+    thumbed_up = False
     user = request.user
     if post.thumb_up.filter(id=user.id).exists():
-        thumbed_up = True 
+        thumbed_up = True
 
-    thumbed_down = False 
+    thumbed_down = False
     if post.thumb_down.filter(id=user.id).exists():
-        thumbed_down = True 
+        thumbed_down = True
 
     context = {
         'my_object': post,
@@ -141,20 +137,20 @@ class MemeAddView(LoginRequiredMixin, CreateView):
 
 
 @login_required
-def deleteMeme(request, id):
+def delete_meme(request, id):
     """
     function to delete meme if requested user is author of this meme.
     """
     my_meme = get_object_or_404(MemePost, id=id)
-    
+
     userRequest = request.user.id
     author = my_meme.user.id
-    
+
     if request.method == 'POST':
         if userRequest == author:
             my_meme.delete()
             return redirect('memeListView')
-    
+
     if request.method == 'GET':
         if userRequest != author:
             return redirect('memeListView')
@@ -168,14 +164,14 @@ def deleteMeme(request, id):
     return render(request, template, context)
 
 
-
-class Meme_like_up(RedirectView):
+class MemeLikeUp(RedirectView):
     """
     Class where we can add our like on the particular meme.
     if we liked this meme then we unable to dislike meme.
     Like works only one time at the requested user.
     """
     # function that will add us like up where we will get 3 argumnets
+
     def get_redirect_url(self, *args, **kwargs):
         # taking the ID of object - each of meme detail view
         id = self.kwargs.get("id")
@@ -186,15 +182,15 @@ class Meme_like_up(RedirectView):
         # taking THIS user from request
         user = self.request.user
         # thumbed_up taking to False and if we thumbed_up then we will return to True
-        thumbed_up = False 
+        thumbed_up = False
         if object_like.thumb_up.filter(id=user.id).exists():
             object_like.thumb_up.remove(user)
             thumbed_up = False
         else:
             object_like.thumb_up.add(user)
-            thumbed_up = True 
-      
-        ## Another method of thumb_up add and remove
+            thumbed_up = True
+
+        # Another method of thumb_up add and remove
         # # if user is logged in then add a point to thumb_up in object_like
         # if user.is_authenticated:
         #     if user in object_like.thumb_up.exists:
@@ -207,13 +203,13 @@ class Meme_like_up(RedirectView):
         return url_
 
 
-
-class Like_down(RedirectView):
+class MemeLikeDown(RedirectView):
     """
     Class where we can add our unlike on the particular meme.
     if we unliked this meme then we unable to disunlike meme.
     Unlike works only one time at the requested user.
     """
+
     def get_redirect_url(self, *args, **kwargs):
         # taking specific object
         object_unlike = get_object_or_404(MemePost, id=self.kwargs.get("id"))
@@ -222,18 +218,12 @@ class Like_down(RedirectView):
         # taking specific user
         user = self.request.user
         # thumbed_down taking to False and if we thumbed_down then we will return to True
-        thumbed_down = False 
+        thumbed_down = False
         if object_unlike.thumb_down.filter(id=user.id).exists():
             object_unlike.thumb_down.remove(user)
-            thumbed_down = False 
+            thumbed_down = False
         else:
             object_unlike.thumb_down.add(user)
-            thumbed_down = True 
+            thumbed_down = True
 
         return url_
-
-
-
-    
-
-    

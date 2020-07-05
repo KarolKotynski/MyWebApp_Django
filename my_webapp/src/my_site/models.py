@@ -5,7 +5,7 @@ from meme_site.models import MemePost
 
 # Create your models here.
 
-class About_me(models.Model):
+class AboutMe(models.Model):
     content = models.TextField()
     author = models.CharField(max_length=50)
 

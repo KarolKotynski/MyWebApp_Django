@@ -1,14 +1,14 @@
 from django import forms
-from .models import Comment_section
+from .models import CommentSection
 
 
 class CommentForm(forms.ModelForm):
     """
-    creating class Meta where our model will be Comment_section from models.py
+    creating class Meta where our model will be CommentSection from models.py
     and changed content form
     """
     class Meta:
-        model = Comment_section
+        model = CommentSection
         widgets = {
             'content': forms.Textarea(attrs={
                 'size': 2,

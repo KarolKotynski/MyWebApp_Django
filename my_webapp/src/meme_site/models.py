@@ -35,7 +35,7 @@ class MemePost(models.Model):
             img.save(self.image.path)
 
 
-class Comment_section(models.Model):
+class CommentSection(models.Model):
     """
     creating class Comment section:
     our post will be foreign key taken from MemePost

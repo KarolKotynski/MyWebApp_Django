@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import About_me, MySiteProfile
-from .forms import UserRegisterForm, ProfileUpdateImgForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from meme_site.models import MemePost
 from django.core.paginator import Paginator
+
+from .forms import UserRegisterForm, ProfileUpdateImgForm
+from .models import AboutMe, MySiteProfile
+from meme_site.models import MemePost
+
 
 
 # Create your views here.
@@ -30,7 +32,7 @@ def home_page(request):
 ### To be developed when the MemeSite will be done.
 def about_me(request):
     context = {
-        'about': About_me.objects.filter(id=1).first()
+        'about': AboutMe.objects.filter(id=1).first()
     }
     
     return render(request, 'my_site/about_me.html', context)
