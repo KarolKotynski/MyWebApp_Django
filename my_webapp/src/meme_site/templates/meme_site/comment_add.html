@@ -1,0 +1,18 @@
+{% extends 'my_site/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- hidden tag - security what Django required-->
+            <fieldset class="form-group2">
+                <legend class="border-bottom" style="margin-bottom: 10px;">Add Meme!</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group2">
+                <button class="btn btn-outline-info" style="margin-bottom: 10px;" type="submit">Create!</button>
+            </div>
+        </form>
+
+{% endblock content%}

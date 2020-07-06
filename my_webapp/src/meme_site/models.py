@@ -22,7 +22,7 @@ class MemePost(models.Model):
         return f"{self.user.username}, {self.title}"
     
     def get_absolute_url(self):
-        return reverse('memeDetailView', kwargs={'id': self.id})
+        return reverse('memeDetailView', kwargs={'pk': self.pk})
     
 
     def save(self, *args, **kwargs):
@@ -47,6 +47,9 @@ class CommentSection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField(max_length=500)
     timestamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering=['-timestamp']
 
     # creating printable class
     def __str__(self):

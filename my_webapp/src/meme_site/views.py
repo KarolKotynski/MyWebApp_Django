@@ -1,13 +1,17 @@
 import datetime
 
+from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, RedirectView, CreateView
+from django.views.generic import ListView, RedirectView, CreateView, DetailView
+from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from .models import MemePost, CommentSection
 from .forms import CommentForm
+from .utils import Thumb
 # Create your views here.
 
 
@@ -28,8 +32,19 @@ class MemeListView(ListView):
         for obj in _objects:
             if obj.thumb_up.count() >= 3:
                 _new_objects.append(obj)
-
         return _new_objects
+
+    """
+    We could merge CommentSection Model to MemeListView and we could use it.
+    we could create class MemeDetailView(DetailView) and use it to show all comments of this meme
+    we can call costam to see objects of CommentSection.
+    costam.first.content show us the content of first comment.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['costam'] = CommentSection.objects.all()
+        print(context)
+        return context
+    """
 
 
 class MemeLobby(ListView):
@@ -69,57 +84,95 @@ class UserMemeListView(ListView):
         return MemePost.objects.filter(user=user).order_by('-date_added')
 
 
-def meme_detail_view(request, id):
-    """
-    Showing one particular meme where is able to like or unlike this meme
-    Logged users can add comments at the below of the meme
-    Comment form is created using forms.py (CommentForm)
-    """
-    post = get_object_or_404(MemePost, id=id)
-    comments = CommentSection.objects.filter(post=post).order_by('-id')
+class MemeDetailView(FormMixin, DetailView):
+    model = MemePost
     template_name = 'meme_site/meme_detail.html'
+    context_object_name = 'user_meme'
+    form_class = CommentForm
 
-    # creating field where we can write comment
-    comment_form = CommentForm(request.POST or None)
+    def get_success_url(self):
+        return reverse('memeDetailView', kwargs={'pk': self.object.pk})
 
-    # if we write someting to this
-    if comment_form.is_valid():
-        # then take our content field from CommentForm
-        content = request.POST.get('content')
-        # then create comment were post will be actual post, user will be requested user
-        # and content taken from comment_form
-        comment = CommentSection.objects.create(
-            post=post, user=request.user, content=content)
-        # then save it and return actual site
-        comment.save()
-        return redirect(post.get_absolute_url())
-    else:
-        comment_form = CommentForm()
+    def get_context_data(self, **kwargs):
+        context = super(MemeDetailView, self).get_context_data(**kwargs)
+        context['comments'] = CommentSection.objects.filter(post=self.kwargs.get('pk'))
+        context['form'] = self.get_form()
+        current_meme = get_object_or_404(MemePost, id=self.object.id)
+        context['thumbed_up'] = current_meme.thumb_up.filter(id=self.request.user.id).exists()
+        context['thumbed_down'] = current_meme.thumb_down.filter(id=self.request.user.id).exists()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
 
-    current_date = datetime.datetime.now()
+        if form.is_valid():
+            user = self.request.user
+            return self.form_valid(form, user)
+        else:
+            return self.form_invalid(form)
 
-    date_delay = comments
+    def form_valid(self, form, user):
+        form.instance.post = self.object
+        form.instance.user = user
+        form.save()
+        return super().form_valid(form)
 
-    # To be refactored ..
-    # maybe just make here the function of thumbs_up and down
-    thumbed_up = False
-    user = request.user
-    if post.thumb_up.filter(id=user.id).exists():
-        thumbed_up = True
+    
 
-    thumbed_down = False
-    if post.thumb_down.filter(id=user.id).exists():
-        thumbed_down = True
 
-    context = {
-        'my_object': post,
-        'my_comments': comments,
-        'comment_form': comment_form,
-        'thumbed_up': thumbed_up,
-        'thumbed_down': thumbed_down,
-        'current_date': current_date,
-    }
-    return render(request, template_name, context)
+
+# def meme_detail_view(request, id):
+#     """
+#     Showing one particular meme where is able to like or unlike this meme
+#     Logged users can add comments at the below of the meme
+#     Comment form is created using forms.py (CommentForm)
+#     """
+#     post = get_object_or_404(MemePost, id=id)
+#     comments = CommentSection.objects.filter(post=post).order_by('-id')
+#     template_name = 'meme_site/meme_detail2.html'
+
+#     # creating field where we can write comment
+#     comment_form = CommentForm(request.POST or None)
+
+#     # if we write someting to this
+#     if comment_form.is_valid():
+#         # then take our content field from CommentForm
+#         content = request.POST.get('content')
+#         # then create comment were post will be actual post, user will be requested user
+#         # and content taken from comment_form
+#         comment = CommentSection.objects.create(
+#             post=post, user=request.user, content=content)
+#         # then save it and return actual site
+#         comment.save()
+#         return redirect(post.get_absolute_url())
+#     else:
+#         comment_form = CommentForm()
+
+#     current_date = datetime.datetime.now()
+
+#     date_delay = comments
+
+#     # To be refactored ..
+#     # maybe just make here the function of thumbs_up and down
+#     thumbed_up = False
+#     user = request.user
+#     if post.thumb_up.filter(id=user.id).exists():
+#         thumbed_up = True
+
+#     thumbed_down = False
+#     if post.thumb_down.filter(id=user.id).exists():
+#         thumbed_down = True
+
+#     context = {
+#         'my_object': post,
+#         'my_comments': comments,
+#         'comment_form': comment_form,
+#         'thumbed_up': thumbed_up,
+#         'thumbed_down': thumbed_down,
+#         'current_date': current_date,
+#     }
+#     return render(request, template_name, context)
 
 
 class MemeAddView(LoginRequiredMixin, CreateView):
@@ -137,11 +190,11 @@ class MemeAddView(LoginRequiredMixin, CreateView):
 
 
 @login_required
-def delete_meme(request, id):
+def delete_meme(request, pk):
     """
     function to delete meme if requested user is author of this meme.
     """
-    my_meme = get_object_or_404(MemePost, id=id)
+    my_meme = get_object_or_404(MemePost, pk=pk)
 
     userRequest = request.user.id
     author = my_meme.user.id
@@ -164,66 +217,24 @@ def delete_meme(request, id):
     return render(request, template, context)
 
 
-class MemeLikeUp(RedirectView):
+class MemeLikeUp(Thumb, RedirectView):
     """
     Class where we can add our like on the particular meme.
     if we liked this meme then we unable to dislike meme.
     Like works only one time at the requested user.
     """
     # function that will add us like up where we will get 3 argumnets
-
-    def get_redirect_url(self, *args, **kwargs):
-        # taking the ID of object - each of meme detail view
-        id = self.kwargs.get("id")
-        # taking the object from MemePost list with ID
-        object_like = get_object_or_404(MemePost, id=id)
-        # creating my return url
-        url_ = object_like.get_absolute_url()
-        # taking THIS user from request
-        user = self.request.user
-        # thumbed_up taking to False and if we thumbed_up then we will return to True
-        thumbed_up = False
-        if object_like.thumb_up.filter(id=user.id).exists():
-            object_like.thumb_up.remove(user)
-            thumbed_up = False
-        else:
-            object_like.thumb_up.add(user)
-            thumbed_up = True
-
-        # Another method of thumb_up add and remove
-        # # if user is logged in then add a point to thumb_up in object_like
-        # if user.is_authenticated:
-        #     if user in object_like.thumb_up.exists:
-        #         object_like.thumb_up.remove(user)
-        #         thumbed_up = False
-        #     else:
-        #         object_like.thumb_up.add(user)
-        #         thumbed_up = True
-        # return absolute url
-        return url_
+    thumbed = 'thumbed_up'
+    model = MemePost
+    
 
 
-class MemeLikeDown(RedirectView):
+class MemeLikeDown(Thumb, RedirectView):
     """
     Class where we can add our unlike on the particular meme.
     if we unliked this meme then we unable to disunlike meme.
     Unlike works only one time at the requested user.
     """
 
-    def get_redirect_url(self, *args, **kwargs):
-        # taking specific object
-        object_unlike = get_object_or_404(MemePost, id=self.kwargs.get("id"))
-        # taking absolute return url
-        url_ = object_unlike.get_absolute_url()
-        # taking specific user
-        user = self.request.user
-        # thumbed_down taking to False and if we thumbed_down then we will return to True
-        thumbed_down = False
-        if object_unlike.thumb_down.filter(id=user.id).exists():
-            object_unlike.thumb_down.remove(user)
-            thumbed_down = False
-        else:
-            object_unlike.thumb_down.add(user)
-            thumbed_down = True
-
-        return url_
+    thumbed = 'thumbed_down'
+    model = MemePost
