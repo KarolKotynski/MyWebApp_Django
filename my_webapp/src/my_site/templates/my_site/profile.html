@@ -1,32 +1,28 @@
 {% extends 'my_site/base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="content-section">
 
-    <div class="authorbox">
-        <h1><img src="{{ user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            <a href="{% url 'userMemes' user.username %}" style="color: #ffffff;">{{ user.username }}</a></h1>
-        {% if user.user.username == user_requested.username %}
-        <p class="text-secondary" style="color: #ffffff; text-align: left;"> {{ user.email }} </p>
-    </div>
-    <form method="POST" enctype="multipart/form-data">
+<div class="authorbox">
+    <h1><img src="{{ user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
+        <a href="{% url 'userMemes' user.username %}" style="color: #ffffff;">{{ user.username }}</a></h1>
+    {% if user.user.username == user_requested.username %}
+    <p class="text-secondary" style="color: #ffffff; text-align: left;"> {{ user.email }} </p>
+</div>
+
+    <form method="POST" enctype="multipart/form-data" style="border-bottom: 30px solid #444444;">
         {% csrf_token %}
         <!-- hidden tag - security what Django required-->
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Change profile image</legend>
             {{ profileform|crispy }}
         </fieldset>
-        <div clas="form-group">
-            <button class="btn btn-outline-info mb-2" type="submit">Update</button>
-        </div>
+        <button class="btn btn-outline-info mb-2" type="submit">Update</button>
     </form>
-    {% endif %}
-</div>
 
 
-<div class="box_title" style="text-align: center; max-width: 750px;">
-    <h2>{{ user.username }} Memes</h2>
-</div>
+{% endif %}
+
+
 {% for meme in memes %}
 <div class="article-metadata-post">
     <div class="box_title">
@@ -43,28 +39,28 @@
     </br>
 </div>
 {% endfor %}
-{% if is_paginated %}
-    <div class="pagination">
-        {% if memes.has_next %}
-        <a class="btn btn-next btn-yellow" href="?page={{ memes.next_page_number }}">Next page</a>
-        <a class="btn btn-last btn-yellow" href="?page={{ memes.paginator.num_pages }}">Last</a>
-        {% else %}
-        <a class="btn btn-next btn-yellow" href="?page={{ memes.previous_page_number }}">Previous page</a>
-        <a class="btn btn-last btn-yellow" href="?page=1">First</a>
-        {% endif %}
-    </div>
+{% if memes.has_next or memes.has_previous %}
+<div class="pagination">
+    {% if memes.has_next %}
+    <a class="btn btn-next btn-yellow" href="?page={{ memes.next_page_number }}">Next page</a>
+    <a class="btn btn-last btn-yellow" href="?page={{ memes.paginator.num_pages }}">Last</a>
+    {% else %}
+    <a class="btn btn-next btn-yellow" href="?page={{ memes.previous_page_number }}">Previous page</a>
+    <a class="btn btn-last btn-yellow" href="?page=1">First</a>
+    {% endif %}
+</div>
 
-    <div class="pages">
-        {% for number in memes.paginator.page_range %}
-        {% if memes.number == number %}
-        <a class="pages" style="color: white;" href="?page={{ memes.number }}">
-            {{ memes.number }}</a>
-        {% elif number > memes.number|add:'-5' and number < memes.number|add:'10' %}
-        <a class="pages" href="?page={{ number }}"> {{ number }}</a>
-        {% endif %}
-        {% endfor %}
-    </div>
+<div class="pages">
+    {% for number in memes.paginator.page_range %}
+    {% if memes.number == number %}
+    <a class="pages" style="color: white;" href="?page={{ memes.number }}">
+        {{ memes.number }}</a>
+    {% elif number > memes.number|add:'-5' and number < memes.number|add:'10' %}
+    <a class="pages" href="?page={{ number }}"> {{ number }}</a>
+    {% endif %}
+    {% endfor %}
+</div>
 {% endif %}
- 
+
 
 {% endblock content %}

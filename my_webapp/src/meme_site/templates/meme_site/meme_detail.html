@@ -14,12 +14,13 @@
         <img src=" {{ user_meme.image.url }}" class="rounded">
     </div>
     
-    {% if user.is_authenticated %}
+    
     <div class="likes_section">
         <h3 style="color: green;">{{ user_meme.thumb_up.count }}
             <span style="color:rgb(0, 0, 0);">/</span>
             <span style="color:red;">{{ user_meme.thumb_down.count }}</span>
         </h3>
+    {% if user.is_authenticated %}
         {% if thumbed_up == False and thumbed_down == False %}
         <a href="{% url 'like_up' user_meme.id %}"><img class="rounded circle_vote" src="/media/plus.png"></a>
         <a href="{% url 'like_down' user_meme.id %}"><img class="rounded circle_vote" src="/media/minus.png"></a>

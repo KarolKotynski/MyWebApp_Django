@@ -1,16 +1,16 @@
 {% extends 'my_site/base.html' %}
 {% block content %}
     <div class="content-section">
-        <form method="post" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <!-- hidden tag - security what Django required-->
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Delete meme</legend>
-                <h3>Delete {{ my_meme.title }}?</h3> 
+                <h3>Delete {{ object }}?</h3> 
             </fieldset>
-            <div clas="form-group">
+            <div class="form-group">
                 <button class="btn btn-outline-danger" type="submit">Yes, delete this meme!</button>
-                <a class="btn btn-outline-secondary" href="{% url 'memeDetailView' my_meme.id %}">Cancel</a>
+                <a class="btn btn-outline-secondary" href="{% url 'memeDetailView' object.id %}">Cancel</a>
             </div>
         </form>
     </div>
