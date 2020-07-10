@@ -1,2 +1,3 @@
-/.vscode/*
-.vscode/*
+.vscode/
+my_webapp/src/meme_site/migrations/
+my_webapp/src/my_site/migrations/
