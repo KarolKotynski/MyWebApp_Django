@@ -20,11 +20,46 @@
             <span style="color:rgb(0, 0, 0);">/</span>
             <span style="color:red;">{{ meme.thumb_down.count }}</span>
         </h3>
+
+        {% if user.is_authenticated %}
+        <form action="{%url 'like-meme' meme.id %}" method="POST">
+            {% csrf_token %}
+            <input type='hidden' name='meme_id' value='{{ meme.id }}'>
+            {% if user not in meme.thumb_up.all and user not in meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus.png">
+            </button>
+            {% elif user in meme.thumb_up.all and user not in meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus_clicked.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus.png">
+            </button>
+            {% elif user not in meme.thumb_up.all and user in meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus_clicked.png">
+            </button>
+            {% else %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus_clicked.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus_clicked.png">
+            </button>
+            {% endif %}
+        </form>
+        {% endif %}
+        
         <h5>{{ meme.date_added|date:"F j, Y, G:i" }}</h5>
     </div>
     {% endfor %}
-
-
 
     {% if is_paginated %}
     <div class="pagination">
@@ -49,7 +84,6 @@
         {% endfor %}
     </div>
     {% endif %}
-
 
 </div>
 {% endblock content %}

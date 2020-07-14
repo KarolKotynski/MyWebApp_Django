@@ -1,21 +1,20 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-steel" style="margin-bottom: 30px;">
 
     <div class="collapse navbar-collapse" id="navbarToggle">
-        <a class="btn btn-warning mr-2" href="{% url 'home_page' %}">Home</a>
-        <a class="btn btn-warning mr-2" href="{% url 'about_page' %}">About me</a>
+        <a class="btn btn-warning mr-1" href="{% url 'memeListView' %}">Meme</a>
+        <a class="btn btn-warning mr-1" href="{% url 'memeLobbyListView' %}">Lobby</a>
     </div>
 
     <div class="dropdown mr-1">
+        {% if user.is_authenticated %}
         <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Meme site
+          Meme Panel
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="{% url 'memeListView' %}">Meme</a>
-            <a class="dropdown-item" href="{% url 'memeLobbyListView' %}">Lobby</a>
-            {% if user.is_authenticated %}
+            
             <a class="dropdown-item" href="{% url 'userMemes' user.username %}">My Memes</a>
             <a class="dropdown-item" href="{% url 'memeAdd' %}">Add Meme!</a>
-            {% endif %}
+        {% endif %}
         </div>
     </div>
 

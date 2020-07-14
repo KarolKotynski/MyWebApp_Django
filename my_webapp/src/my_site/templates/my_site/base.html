@@ -15,7 +15,8 @@
   <body>
     <main role="main" class="container">
           {% include 'my_site/navbar.html' %}
-
+          
+        <div class="article-metadata">
           {% if messages %}
             {% for message in messages %}
               <div class="alert alert-{{ message.tags }}">
@@ -23,8 +24,6 @@
               </div>
             {% endfor%}
           {% endif%}
-          
-        <div class="article-metadata">
             {% block content %}{% endblock %}
         </div>
       </main>

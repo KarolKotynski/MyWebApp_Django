@@ -1,35 +1,48 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import HttpResponseRedirect, get_object_or_404
+
+from .forms import CommentForm
 from .models import MemePost
 
-class Thumb:
-    thumbed = None
-    model = None
-    
-    def get_redirect_url(self, pk, *args, **kwargs):
-        # taking the ID of object - each of meme detail view
-        pk = self.kwargs.get("pk")
-        # taking the object from MemePost list with ID
-        current_object = get_object_or_404(self.model, pk=pk)
-        # creating my return url
-        url_ = current_object.get_absolute_url()
-        # taking THIS user from request
-        user = self.request.user
-        # thumbed taking to False and if we thumbed then we will return to True
-        thumbed = self.thumbed
+class LikeMeme:
+    """
+    This class has function post which like or unlike meme or 
+    if we choose comment submit button our comment will be created.
+    If we liked post we are able to return like and give unlike if we want to
+    Is not possible to give like and unlike in one time.
+    As a return we will be redirected to the same page where we were
+    """
+    def post(self, request, *args, **kwargs):
+        # liked and unliked are a name of clicked button
+        if 'liked' in request.POST or 'unliked' in request.POST:
+            if request.method == "POST":
+                user = request.user
+                post_id = request.POST.get('meme_id')
+                post_obj = MemePost.objects.get(pk = post_id)
 
-        if thumbed == 'thumbed_up':
-            if current_object.thumb_up.filter(id=user.id).exists():
-                current_object.thumb_up.remove(user)
-                thumbed_up = False
-            else:
-                current_object.thumb_up.add(user)
-                thumbed_up = True
+                if 'liked' in request.POST:  
+                    if user not in post_obj.thumb_up.all() and user not in post_obj.thumb_down.all():
+                        post_obj.thumb_up.add(user)
+                    elif user in post_obj.thumb_up.all() and user not in post_obj.thumb_down.all():
+                        post_obj.thumb_up.remove(user)
+                    else:
+                        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+                if 'unliked' in request.POST:
+                    if user not in post_obj.thumb_up.all() and user not in post_obj.thumb_down.all():
+                        post_obj.thumb_down.add(user)
+                    elif user not in post_obj.thumb_up.all() and user in post_obj.thumb_down.all():
+                        post_obj.thumb_down.remove(user)
+                    else:
+                        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))       
         else:
-            if current_object.thumb_down.filter(id=user.id).exists():
-                current_object.thumb_down.remove(user)
-                thumbed_down = False
-            else:
-                current_object.thumb_down.add(user)
-                thumbed_down = True
+            self.object = self.get_object()
+            form = self.get_form(form_class=CommentForm)
+            print(form)
 
-        return url_
+            if form.is_valid():
+                user = self.request.user
+                return self.form_valid(form, user)
+            else:
+                return self.form_invalid(form)

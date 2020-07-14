@@ -7,30 +7,55 @@
 <div class="article-metadata">
     <div class="authorbox">
         <h1><img src="{{ user_meme.user.mysiteprofile.image.url }}" class="rounded-circle circle_img_detail">
-            <a href="{% url 'userMemes' user_meme.user.username %}" style="color: #ffffff;">{{ user_meme.user.username }}</a></h1>
+            <a href="{% url 'userMemes' user_meme.user.username %}"
+                style="color: #ffffff;">{{ user_meme.user.username }}</a></h1>
     </div>
     <div class="box_title">
         <h2> {{ user_meme.title }}</h2>
         <img src=" {{ user_meme.image.url }}" class="rounded">
     </div>
-    
-    
+
     <div class="likes_section">
         <h3 style="color: green;">{{ user_meme.thumb_up.count }}
             <span style="color:rgb(0, 0, 0);">/</span>
             <span style="color:red;">{{ user_meme.thumb_down.count }}</span>
         </h3>
-    {% if user.is_authenticated %}
-        {% if thumbed_up == False and thumbed_down == False %}
-        <a href="{% url 'like_up' user_meme.id %}"><img class="rounded circle_vote" src="/media/plus.png"></a>
-        <a href="{% url 'like_down' user_meme.id %}"><img class="rounded circle_vote" src="/media/minus.png"></a>
-        {% elif thumbed_up == True and thumbed_down == False %}
-        <img class="rounded circle_vote" src="/media/plus_clicked.png"></a>
-        <img class="rounded circle_vote" src="/media/minus.png"></a>
-        {% elif thumbed_up == False and thumbed_down == True %}
-        <img class="rounded circle_vote" src="/media/plus.png"></a>
-        <img class="rounded circle_vote" src="/media/minus_clicked.png"></a>
-        {% endif %}
+
+        {% if user.is_authenticated %}
+        <form action="{%url 'like-meme-detail' user_meme.id %}" method="POST">
+            {% csrf_token %}
+            <input type='hidden' name='meme_id' value='{{ user_meme.id }}'>
+            {% if user not in user_meme.thumb_up.all and user not in user_meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus.png">
+            </button>
+            {% elif user in user_meme.thumb_up.all and user not in user_meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus_clicked.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus.png">
+            </button>
+            {% elif user not in user_meme.thumb_up.all and user in user_meme.thumb_down.all %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus_clicked.png">
+            </button>
+            {% else %}
+            <button class="rounded" type="submit" name="liked">
+                <img class="rounded circle_vote" src="/media/plus_clicked.png">
+            </button>
+            <button class="rounded" type="submit" name="unliked">
+                <img class="rounded circle_vote" src="/media/minus_clicked.png">
+            </button>
+            {% endif %}
+        </form>
+
         {% if user == user_meme.user %}
         </br>
         <small>
@@ -67,35 +92,19 @@
     <h6>{{ comments.count }} comments:</h6>
     {% endif %}
     <h6>{% for comment in comments %}
-        
-    <div class="blockquote">
-        <div style="font-size: small">
-            <h3 class="mb-0"> {{ comment.content }} </h3>
-            <small>
-                <p class="mb-0"> {{ comment.timestamp|naturaltime }} </p>
-            </small>
+
+        <div class="blockquote">
+            <div style="font-size: small">
+                <h3 class="mb-0"> {{ comment.content }} </h3>
+                <small>
+                    <p class="mb-0"> {{ comment.timestamp|naturaltime }} </p>
+                </small>
+            </div>
+            <footer class="blockquote-footer">By <cite title="Source Title"><a
+                        href="{% url 'mySiteProfile_page' comment.user %}"
+                        style="color: #ffffff;">{{comment.user|capfirst}}</a></cite></footer>
         </div>
-        <footer class="blockquote-footer">By <cite
-                title="Source Title"><a href="{% url 'mySiteProfile_page' comment.user %}" style="color: #ffffff;">{{comment.user|capfirst}}</a></cite></footer>
-    </div>
-    
-    {% endfor %}
+        {% endfor %}
 </div>
-
-
-
-
-
-
 
 {% endblock content%}
-
-<!-- 
-    Just to remember 
-<div>
-    <p2> {{ user_meme.user }}</p2>
-    <p2> {{ user_meme.id}}</p2>
-    <p2> {{ user_meme.slug }} </p2>
-</div>
-
- -->

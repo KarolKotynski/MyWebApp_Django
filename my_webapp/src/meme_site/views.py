@@ -1,27 +1,33 @@
 import datetime
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import (
+    HttpResponseRedirect,
+    get_object_or_404,
+    redirect,
+    render
+)
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
-    DetailView, 
-    ListView, 
-    RedirectView,
-    DeleteView
+    DeleteView,
+    DetailView,
+    ListView,
+    RedirectView
 )
 from django.views.generic.edit import FormMixin
 
 from .forms import CommentForm
 from .models import CommentSection, MemePost
-from .utils import Thumb
+from .utils import LikeMeme
 
 # Create your views here.
 
 
-class MemeListView(ListView):
+class MemeListView(LikeMeme, ListView):
     """
     generate List view of memes which have at least 3 likes
     Memes are paginated by 5
@@ -39,19 +45,6 @@ class MemeListView(ListView):
             if obj.thumb_up.count() >= 3:
                 _new_objects.append(obj)
         return _new_objects
-
-    """
-    We could merge CommentSection Model to MemeListView and we could use it.
-    we could create class MemeDetailView(DetailView) and use it to show all comments of this meme
-    we can call costam to see objects of CommentSection.
-    costam.first.content show us the content of first comment.
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['costam'] = CommentSection.objects.all()
-        print(context)
-        return context
-    """
-
 
 class MemeLobby(ListView):
     """
@@ -90,7 +83,11 @@ class UserMemeListView(ListView):
         return MemePost.objects.filter(user=user).order_by('-date_added')
 
 
-class MemeDetailView(FormMixin, DetailView):
+class MemeDetailView(LikeMeme, FormMixin, DetailView):
+    """
+    This class render selected Meme from Meme List
+    additionally showing its comments and we are able to add comment if we are logged in
+    """
     model = MemePost
     template_name = 'meme_site/meme_detail.html'
     context_object_name = 'user_meme'
@@ -102,21 +99,7 @@ class MemeDetailView(FormMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(MemeDetailView, self).get_context_data(**kwargs)
         context['comments'] = CommentSection.objects.filter(post=self.kwargs.get('pk'))
-        current_meme = get_object_or_404(MemePost, id=self.object.id)
-        context['thumbed_up'] = current_meme.thumb_up.filter(id=self.request.user.id).exists()
-        context['thumbed_down'] = current_meme.thumb_down.filter(id=self.request.user.id).exists()
         return context
-    
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form(form_class=CommentForm)
-        print(form)
-
-        if form.is_valid():
-            user = self.request.user
-            return self.form_valid(form, user)
-        else:
-            return self.form_invalid(form)
 
     def form_valid(self, form, user):
         form.instance.post = self.object
@@ -148,6 +131,8 @@ class MemeDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'meme_site/meme_delete.html'
 
     def get_success_url(self):
+        curren_meme = self.get_object().title
+        messages.success(self.request, f"{curren_meme} deleted!")
         return reverse('memeListView')
 
     def test_func(self):
@@ -156,26 +141,3 @@ class MemeDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
-
-
-class MemeLikeUp(Thumb, RedirectView):
-    """
-    Class where we can add our like on the particular meme.
-    if we liked this meme then we unable to dislike meme.
-    Like works only one time at the requested user.
-    """
-    # function that will add us like up where we will get 3 argumnets
-    thumbed = 'thumbed_up'
-    model = MemePost
-    
-
-
-class MemeLikeDown(Thumb, RedirectView):
-    """
-    Class where we can add our unlike on the particular meme.
-    if we unliked this meme then we unable to disunlike meme.
-    Unlike works only one time at the requested user.
-    """
-
-    thumbed = 'thumbed_down'
-    model = MemePost

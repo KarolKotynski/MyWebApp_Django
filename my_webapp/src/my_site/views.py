@@ -11,32 +11,6 @@ from meme_site.models import MemePost
 
 
 # Create your views here.
-### Home page view, to be developed in the near future
-def home_page(request):
-    posts = [
-    {
-    'title': 'Hello World!'
-    },
-    {
-    'title': 'To Be!'
-    },
-    {
-    'title': 'Developed!'
-    },
-]
-    context = {
-        'posts': posts
-        }
-    return render(request, 'my_site/home_page.html', context)
-
-### To be developed when the MemeSite will be done.
-def about_me(request):
-    context = {
-        'about': AboutMe.objects.filter(id=1).first()
-    }
-    
-    return render(request, 'my_site/about_me.html', context)
-
 
 def register(request):
     """
