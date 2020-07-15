@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
 from .forms import UserRegisterForm, ProfileUpdateImgForm
-from .models import AboutMe, MySiteProfile
+from .models import MySiteProfile
 from meme_site.models import MemePost
 
 

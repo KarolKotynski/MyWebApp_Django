@@ -4,11 +4,6 @@ from PIL import Image
 from meme_site.models import MemePost
 
 # Create your models here.
-
-class AboutMe(models.Model):
-    content = models.TextField()
-    author = models.CharField(max_length=50)
-
 class MySiteProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default="incognito.png", upload_to="Profile_image")
